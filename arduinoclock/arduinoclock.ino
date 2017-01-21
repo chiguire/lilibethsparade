@@ -33,17 +33,17 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 void setup(void) {
   Serial.begin(9600);
   tft.begin();
-  tft.setRotation(1);
+  tft.setRotation(0);
   tft.fillScreen(ILI9341_BLACK);
   SD.begin(SD_CS);
 }
 
 void loop() {
-  bmpDraw("queen.bmp", 40, 0);
-  bmpDraw("queen2.bmp", 40, 0);
-  bmpDraw("philip.bmp", 40, 0);
-  bmpDraw("bigben.bmp", 40, 0);
-  bmpDraw("bigbenne.bmp", 40, 0);
+  bmpDraw("queen.bmp", 0, 40);
+  bmpDraw("queen2.bmp", 0, 40);
+  bmpDraw("philip.bmp", 0, 40);
+  bmpDraw("bigben.bmp", 0, 40);
+  bmpDraw("bigbenne.bmp", 0, 40);
 }
 
 // This function opens a Windows Bitmap (BMP) file and
