@@ -1,3 +1,3 @@
-This is the code repository for the Raspberry Pi sketch.
+This is the code repository for the game's Processing sketch.
 
-It requires a Raspbian Jessie installation, OpenCV 3.1.0, Python 3, raspi camera and GPIO.
+It requires Processing 3+, with the Leap Motion library installed.
