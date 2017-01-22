@@ -30,22 +30,38 @@ Adafruit_NeoPixel strip1 = Adafruit_NeoPixel(4, PIN1, NEO_GRB + NEO_KHZ800);
 int pos = 0;
 int pos2 = 0; // variable to store the servo position
 
+int oldpos = 0;
+int oldpos2 = 0;
+
 byte inputbuffer[2];
 
 void setup() {
   Serial.begin(9600);
   myservo.attach(9);
   myservo2.attach(7);  // attaches the servo on pin 9 to the servo object
-  myservo.write(0);
-  myservo2.write(0);
+  myservo.write(90);
+  myservo2.write(90);
+  delay(3000);
 
+  myservo.write(30);
+  myservo2.write(30);
+  delay(3000);
+
+  myservo.write(120);
+  myservo2.write(120);
+  delay(3000);
+  
   strip0.begin();
   strip0.show(); // Initialize all pixels to 'off'
   strip1.begin();
   strip1.show(); // Initialize all pixels to 'off'
 
-  inputbuffer[0] = 0;
-  inputbuffer[1] = 0;
+  inputbuffer[0] = -100;
+  inputbuffer[1] = -100;
+  pos = 0;
+  pos2 = 0;
+  myservo.write(30);
+  myservo2.write(30);
 }
 
 void colorWipe(uint32_t c, uint8_t wait) {
@@ -90,83 +106,105 @@ void loop() {
   //  pos2 += 1;
   //}
 
-  if (pos >= 150)
+  if (pos >= 120)
   {
-    pos = 150;
+    pos = 120;
   }
-  if (pos2 >= 150)
+  if (pos2 >= 120)
   {
-    pos2 = 150;
+    pos2 = 120;
   }
 
-  if (pos > 38)
+  strip0.setPixelColor(0,0,0,0);
+  strip0.setPixelColor(1,0,0,0);
+  strip0.setPixelColor(2,0,0,0);
+  strip0.setPixelColor(3,0,0,0);
+  strip1.setPixelColor(0,0,0,0);
+  strip1.setPixelColor(1,0,0,0);
+  strip1.setPixelColor(2,0,0,0);
+  strip1.setPixelColor(3,0,0,0);
+  if (pos > 52)
   {
     strip0.setPixelColor(0, Wheel(21));
   }
-  if (pos > 76)
+  if (pos > 74)
   {
     strip0.setPixelColor(1, Wheel(42));
   }
-  if (pos > 114)
+  if (pos > 96)
   {
     strip0.setPixelColor(2, Wheel(63));
   }
-  if (pos >= 150)
+  if (pos >= 120)
   {
     strip0.setPixelColor(3, Wheel(42));
   }
   strip0.show();
 
-    if (pos2 > 38)
+  if (pos2 > 52)
   {
     strip1.setPixelColor(0, Wheel(255));
   }
-  if (pos2 > 76)
+  if (pos2 > 74)
   {
     strip1.setPixelColor(1, Wheel(234));
   }
-  if (pos2 > 114)
+  if (pos2 > 96)
   {
     strip1.setPixelColor(2, Wheel(213));
   }
-  if (pos2 >= 150)
+  if (pos2 >= 120)
   {
     strip1.setPixelColor(3, Wheel(192));
   }
   strip1.show();
-  
-  myservo.write(pos);
-  myservo2.write(pos2);
+
+  if (oldpos != pos)
+  {
+    myservo.write(pos);
+  }
+  if (oldpos2 != pos2)
+  {
+    myservo2.write(pos2);
+  }
   delay(10);
 
-  if (pos == 150 && pos2 == 150)
-  {
-    delay(7000);
-    pos = 0;
-    pos2 = 0;
-    myservo.write(0);
-    myservo2.write(0);
-    strip0.setPixelColor(0, 0, 0, 0);
-    strip1.setPixelColor(0, 0, 0, 0);
-    strip0.setPixelColor(1, 0, 0, 0);
-    strip1.setPixelColor(1, 0, 0, 0);
-    strip0.setPixelColor(2, 0, 0, 0);
-    strip1.setPixelColor(2, 0, 0, 0);
-    strip0.setPixelColor(3, 0, 0, 0);
-    strip1.setPixelColor(3, 0, 0, 0);
-    strip0.show();
-    strip1.show();
-    
-  }
+  oldpos = pos;
+  oldpos2 = pos2;
+
+  //if (pos == 120 && pos2 == 120)
+  //{
+  //  delay(7000);
+  //  pos = 0;
+  //  pos2 = 0;
+  //  myservo.write(0);
+  //  myservo2.write(0);
+  //  strip0.setPixelColor(0, 0, 0, 0);
+  //  strip1.setPixelColor(0, 0, 0, 0);
+  //  strip0.setPixelColor(1, 0, 0, 0);
+  //  strip1.setPixelColor(1, 0, 0, 0);
+  //  strip0.setPixelColor(2, 0, 0, 0);
+  //  strip1.setPixelColor(2, 0, 0, 0);
+  //  strip0.setPixelColor(3, 0, 0, 0);
+  //  strip1.setPixelColor(3, 0, 0, 0);
+  //  strip0.show();
+  //  strip1.show();
+  //  
+  //}
 }
 
 void serialEvent()
 {
   while (Serial.available() >= 2) {
     Serial.readBytes(inputbuffer, 2);
-    pos = inputbuffer[0];
-    pos2 = inputbuffer[1];
+    pos = scaleProgress(inputbuffer[0]);
+    pos2 = scaleProgress(inputbuffer[1]);
   }
+}
+
+int scaleProgress(byte b)
+{
+  return b;
 }
 
 // Input a value 0 to 255 to get a color value.
