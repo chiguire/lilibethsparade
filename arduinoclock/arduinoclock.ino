@@ -1,18 +1,10 @@
 /***************************************************
-  This is our Bitmap drawing example for the Adafruit ILI9341 Breakout and Shield
+  This sketch the Bitmap drawing example for the 
+  Adafruit ILI9341 Breakout and Shield from Adafruit
   ----> http://www.adafruit.com/products/1651
 
-  Check out the links above for our tutorials and wiring diagrams
-  These displays use SPI to communicate, 4 or 5 pins are required to
-  interface (RST is optional)
-  Adafruit invests time and resources providing this open source code,
-  please support Adafruit and open-source hardware by purchasing
-  products from Adafruit!
-
-  Written by Limor Fried/Ladyada for Adafruit Industries.
-  MIT license, all text above must be included in any redistribution
+  Requires an Arduino Uno or similar to make it work.
  ****************************************************/
-
 
 #include <Adafruit_GFX.h>    // Core graphics library
 #include "Adafruit_ILI9341.h" // Hardware-specific library
@@ -30,6 +22,24 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 
 #define SD_CS 4
 
+#define IDLE_WAITING 0
+#define ONE_HAND_WAITING 1
+#define TWO_HANDS_WAITING 2
+#define CLOSE_HAND_WAITING 3
+#define READY_STARTING 4
+#define SET_STARTING 5
+#define GO_STARTING 6
+#define PLAYING 7
+#define WINNER_PLAYER_LEFT 8
+#define WINNER_PLAYER_RIGHT 9
+
+int imageDrawn = 0;
+int lastImageDrawn = -1;
+int animFrame = 0;
+
+const int f_x = 0;
+const int f_y = 40;
+
 void setup(void) {
   Serial.begin(9600);
   tft.begin();
@@ -39,11 +49,141 @@ void setup(void) {
 }
 
 void loop() {
-  bmpDraw("queen.bmp", 0, 40);
-  bmpDraw("queen2.bmp", 0, 40);
-  bmpDraw("philip.bmp", 0, 40);
-  bmpDraw("bigben.bmp", 0, 40);
-  bmpDraw("bigbenne.bmp", 0, 40);
+  if (imageDrawn != lastImageDrawn)
+  {
+    Serial.print("Drawing image ");
+    Serial.println(imageDrawn);
+    switch (imageDrawn)
+    {
+        case IDLE_WAITING:     idle_waiting(); break;
+        case ONE_HAND_WAITING: one_hand_waiting(); break;
+        case TWO_HANDS_WAITING: two_hands_waiting(); break;
+        case CLOSE_HAND_WAITING: close_hand_waiting(); break;
+        case READY_STARTING: ready_starting(); break;
+        case SET_STARTING: set_starting(); break;
+        case GO_STARTING: go_starting(); break;
+        case PLAYING: playing(); break;
+        case WINNER_PLAYER_LEFT: winner_player_left(); break;
+        case WINNER_PLAYER_RIGHT: winner_player_right(); break;
+    }
+    lastImageDrawn = imageDrawn;
+    Serial.println("Done");
+  }
+  else
+  {
+    updateCurrentImage();
+  }
+  delay(50);
+
+  //bmpDraw("queen2.bmp", f_x, f_y);
+  //bmpDraw("queen.bmp", 0, 40);
+  //bmpDraw("queen2.bmp", 0, 40);
+  //bmpDraw("philip.bmp", 0, 40);
+  //bmpDraw("bigben.bmp", 0, 40);
+  //bmpDraw("bigbenne.bmp", 0, 40);
+}
+
+void serialEvent()
+{
+  while (Serial.available()) {
+    
+    char inChar = (char)Serial.read();
+    if (inChar == '0')
+    {
+      imageDrawn = IDLE_WAITING;
+      Serial.println("IDLE_WAITING");
+    }
+    else if (inChar == '1')
+    {
+      imageDrawn = ONE_HAND_WAITING;
+      Serial.println("ONE_HAND_WAITING");
+    }
+    else if (inChar == '2')
+    {
+      imageDrawn = TWO_HANDS_WAITING;
+      Serial.println("TWO_HANDS_WAITING");
+    }
+    else if (inChar == '3')
+    {
+      imageDrawn = CLOSE_HAND_WAITING;
+      Serial.println("CLOSE_HAND_WAITING");
+    }
+    else if (inChar == '4')
+    {
+      imageDrawn = READY_STARTING;
+      Serial.println("READY_STARTING");
+    }
+    else if (inChar == '5')
+    {
+      imageDrawn = SET_STARTING;
+      Serial.println("SET_STARTING");
+    }
+    else if (inChar == '6')
+    {
+      imageDrawn = GO_STARTING;
+      Serial.println("GO_STARTING");
+    }
+    else if (inChar == '7')
+    {
+      imageDrawn = PLAYING;
+      Serial.println("PLAYING");
+    }
+    else if (inChar == '8')
+    {
+      imageDrawn = WINNER_PLAYER_LEFT;
+      Serial.println("WINNER_PLAYER_LEFT");
+    }
+    else if (inChar == '9')
+    {
+      imageDrawn = WINNER_PLAYER_RIGHT;
+      Serial.println("WINNER_PLAYER_RIGHT");
+    }
+  }
+}
+
+void one_hand_waiting()
+{
+  
+}
+
+void two_hands_waiting()
+{
+
+}
+
+void close_hand_waiting()
+{
+
+}
+
+void ready_starting()
+{
+
+}
+
+void set_starting()
+{
+
+}
+
+void go_starting()
+{
+
+}
+
+void playing()
+{
+
+}
+
+void winner_player_left()
+{
+
+}
+
+void winner_player_right()
+{
+
 }
 
 // This function opens a Windows Bitmap (BMP) file and
@@ -80,7 +220,7 @@ void bmpDraw(char *filename, uint8_t x, uint16_t y) {
 
   // Open requested file on SD card
   if ((bmpFile = SD.open(filename)) == NULL) {
-    Serial.print(F("File not found"));
+    //Serial.print(F("File not found"));
     return;
   }
 
@@ -185,3 +325,4 @@ uint32_t read32(File &f) {
   ((uint8_t *)&result)[3] = f.read(); // MSB
   return result;
 }
+
