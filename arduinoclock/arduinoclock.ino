@@ -38,7 +38,11 @@ int lastImageDrawn = -1;
 int animFrame = 0;
 
 const int f_x = 0;
-const int f_y = 40;
+const int f_y = 50;
+const int h_y = 50+93;
+const int h_x_left = 67;
+const int h_x_right = 128;
+const int h_x_center = 99;
 
 void setup(void) {
   Serial.begin(9600);
@@ -81,6 +85,15 @@ void loop() {
   //bmpDraw("philip.bmp", 0, 40);
   //bmpDraw("bigben.bmp", 0, 40);
   //bmpDraw("bigbenne.bmp", 0, 40);
+}
+
+void updateCurrentImage()
+{
+  switch(imageDrawn)
+  {
+  case CLOSE_HAND_WAITING: close_hand_waiting_update(); break;
+  case PLAYING: playing_update(); break;
+  }
 }
 
 void serialEvent()
@@ -141,49 +154,95 @@ void serialEvent()
   }
 }
 
+void idle_waiting()
+{
+  bmpDraw("bigben.bmp", f_x, f_y);
+  bmpDraw("closedhr.bmp", h_x_left, h_y);
+  bmpDraw("closedhr.bmp", h_x_right, h_y);
+}
+
 void one_hand_waiting()
 {
-  
+  bmpDraw("bigben.bmp", f_x, f_y);
+  bmpDraw("openhand.bmp", h_x_left, h_y);
+  bmpDraw("closedhr.bmp", h_x_right, h_y);
 }
 
 void two_hands_waiting()
 {
-
+  bmpDraw("bigben.bmp", f_x, f_y);
+  bmpDraw("openhand.bmp", h_x_left, h_y);
+  bmpDraw("openhand.bmp", h_x_right, h_y);
 }
 
 void close_hand_waiting()
 {
+  bmpDraw("bigben.bmp", f_x, f_y);
+  bmpDraw("openhand.bmp", h_x_center, h_y);
+  animFrame = 0;
+}
 
+void close_hand_waiting_update()
+{
+    if (animFrame == 0)
+    {
+      bmpDraw("closedh.bmp", h_x_center, h_y);
+      animFrame = 1;
+    } else
+    {
+      bmpDraw("openhand.bmp", h_x_center, h_y);
+      animFrame = 0;
+    }
 }
 
 void ready_starting()
 {
-
+  bmpDraw("bigben.bmp", f_x, f_y);
+  tft.fillCircle(85, 50+120, 15, ILI9341_RED);
+  tft.fillCircle(120, 50+120, 15, ILI9341_RED);
+  tft.fillCircle(155, 50+120, 15, ILI9341_RED);
 }
 
 void set_starting()
 {
-
+  //bmpDraw("bigben.bmp", f_x, f_y);
+  tft.fillCircle(155, 50+120, 15, ILI9341_WHITE);
 }
 
 void go_starting()
 {
-
+  //bmpDraw("bigbenne.bmp", f_x, f_y);
+  tft.fillCircle(120, 50+120, 15, ILI9341_WHITE);
 }
 
 void playing()
 {
+  bmpDraw("bigben.bmp", f_x, f_y);
+  bmpDraw("closedh.bmp", h_x_center, h_y);
+  animFrame = 0;
+}
 
+void playing_update()
+{
+  if (animFrame == 0)
+    {
+      bmpDraw("closedhf.bmp", h_x_center, h_y);
+      animFrame = 1;
+    } else
+    {
+      bmpDraw("closedh.bmp", h_x_center, h_y);
+      animFrame = 0;
+    }
 }
 
 void winner_player_left()
 {
-
+  bmpDraw("queen2.bmp", f_x, f_y);
 }
 
 void winner_player_right()
 {
-
+  bmpDraw("philip.bmp", f_x, f_y);
 }
 
 // This function opens a Windows Bitmap (BMP) file and
