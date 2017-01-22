@@ -1,4 +1,5 @@
 import de.voidplus.leapmotion.*;
+import processing.serial.*;
 
 LeapMotion leap;
 
@@ -9,6 +10,13 @@ int playerLeftId = -1;
 int playerRightId = -1;
 int numHands = 0;
 
+float progressLeft = 0.0f;
+float progressRight = 0.0f;
+float maxProgress = 100.0f;
+
+Serial screenPort;
+Serial carPort;
+
 void setup() {
   size(800, 500);
   background(255);
@@ -16,6 +24,13 @@ void setup() {
   gameState = GameStateEnum.IDLE_WAITING;
   ticks = new WaitingTicks();
   ticks.setNoWaiting();
+  
+  printArray(Serial.list());
+  //screenPort = new Serial(this, "COM5", 9600);
+  //carPort = new Serial(this, "COM6", 9600);
+  
+  if (screenPort != null)
+    screenPort.write('0');
 }
 
 void drawGameState()
@@ -24,7 +39,9 @@ void drawGameState()
   text("Waiting ticks: " + ticks.toString(), 10, 20);
   text("Number hands: " + numHands, 10, 30);
   text("Player Left Id: " + playerLeftId, 10, 40);
-  text("Player Right Id: " + playerRightId, 10, 50);
+  text("Player Left Progress: " + progressLeft + "/" + maxProgress + " (" + (int)(progressLeft/maxProgress) + ")", 10, 50);
+  text("Player Right Id: " + playerRightId, 10, 60);
+  text("Player Right Progress: " + progressRight + "/" + maxProgress + " (" + (int)(progressRight/maxProgress) + ")", 10, 70);
 }
 
 void draw()
@@ -85,10 +102,10 @@ void exit_current_state(GameStateEnum st)
   switch (st)
   {
   case IDLE_WAITING:
-    //idle_waiting_exit(); 
+    idle_waiting_exit(); 
     break;
   case ONE_HAND_WAITING:
-    //one_hand_waiting_exit(); 
+    one_hand_waiting_exit(); 
     break;
   case TWO_HANDS_WAITING:
     two_hands_waiting_exit(); 
@@ -109,10 +126,10 @@ void exit_current_state(GameStateEnum st)
     playing_exit(); 
     break;
   case WINNER_PLAYER_LEFT:
-    //winner_player_left_exit(); 
+    winner_player_left_exit(); 
     break;
   case WINNER_PLAYER_RIGHT:
-    //winner_player_right_exit(); 
+    winner_player_right_exit(); 
     break;
   }
 }
@@ -122,10 +139,10 @@ void enter_new_state(GameStateEnum st)
   switch (st)
   {
   case IDLE_WAITING:
-    //idle_waiting_enter(); 
+    idle_waiting_enter(); 
     break;
   case ONE_HAND_WAITING:
-    //one_hand_waiting_enter();
+    one_hand_waiting_enter();
     break;
   case TWO_HANDS_WAITING:
     two_hands_waiting_enter();
@@ -146,10 +163,10 @@ void enter_new_state(GameStateEnum st)
     playing_enter(); 
     break;
   case WINNER_PLAYER_LEFT:
-    //winner_player_left_enter(); 
+    winner_player_left_enter(); 
     break;
   case WINNER_PLAYER_RIGHT:
-    //winner_player_right_enter(); 
+    winner_player_right_enter(); 
     break;
   }
 }
@@ -163,6 +180,16 @@ void idle_waiting()
   {
     set_state(GameStateEnum.ONE_HAND_WAITING);
   }
+}
+
+void idle_waiting_enter()
+{
+  if (screenPort != null)
+    screenPort.write('0');
+}
+
+void idle_waiting_exit()
+{
 }
 
 /************************
@@ -179,11 +206,23 @@ void one_hand_waiting()
   }
 }
 
+void one_hand_waiting_enter()
+{
+  if (screenPort != null)
+    screenPort.write('1');
+}
+
+void one_hand_waiting_exit()
+{
+}
+
 /************************
  TWO_HANDS_WAITING
  ************************/
 void two_hands_waiting_enter()
 {
+  if (screenPort != null)
+    screenPort.write('2');
   ticks.setWaitingTicks(200);
 }
 
@@ -235,6 +274,8 @@ void close_hand_waiting_enter()
   }
   
   ticks.setWaitingTicks(500);
+  if (screenPort != null)
+    screenPort.write('3');
 }
 
 void close_hand_waiting_exit()
@@ -247,11 +288,17 @@ void close_hand_waiting_exit()
  ************************/
 void ready_starting()
 {
+  if (ticks.triggered())
+  {
+    set_state(GameStateEnum.SET_STARTING);
+  }
 }
 
 void ready_starting_enter()
 {
-  ticks.setWaitingTicks(300);
+  if (screenPort != null)
+    screenPort.write('4');
+  ticks.setWaitingTicks(100);
 }
 
 void ready_starting_exit()
@@ -264,11 +311,17 @@ void ready_starting_exit()
  ************************/
 void set_starting()
 {
+  if (ticks.triggered())
+  {
+    set_state(GameStateEnum.GO_STARTING);
+  }
 }
 
 void set_starting_enter()
 {
-  ticks.setWaitingTicks(300);
+  if (screenPort != null)
+    screenPort.write('5');
+  ticks.setWaitingTicks(100);
 }
 
 void set_starting_exit()
@@ -281,11 +334,17 @@ void set_starting_exit()
  ************************/
 void go_starting()
 {
+  if (ticks.triggered())
+  {
+    set_state(GameStateEnum.PLAYING);
+  }
 }
 
 void go_starting_enter()
 {
-  ticks.setWaitingTicks(300);
+  if (screenPort != null)
+    screenPort.write('6');
+  ticks.setWaitingTicks(100);
 }
 
 void go_starting_exit()
@@ -302,6 +361,10 @@ void playing()
 
 void playing_enter()
 {
+  if (screenPort != null)
+    screenPort.write('7');
+  progressLeft = 0.0f;
+  progressRight = 0.0f;
 }
 
 void playing_exit()
@@ -313,6 +376,22 @@ void playing_exit()
  ************************/
 void winner_player_left()
 {
+  if (ticks.triggered())
+  {
+    set_state(GameStateEnum.IDLE_WAITING);
+  }
+}
+
+void winner_player_left_enter()
+{
+  if (screenPort != null)
+    screenPort.write('8');
+  ticks.setWaitingTicks(500);
+}
+
+void winner_player_left_exit()
+{
+  ticks.setNoWaiting();
 }
 
 /************************
@@ -320,4 +399,21 @@ void winner_player_left()
  ************************/
 void winner_player_right()
 {
+  if (ticks.triggered())
+  {
+    set_state(GameStateEnum.IDLE_WAITING);
+  }
+}
+
+
+void winner_player_right_enter()
+{
+  if (screenPort != null)
+    screenPort.write('9');
+  ticks.setWaitingTicks(500);
+}
+
+void winner_player_right_exit()
+{
+  ticks.setNoWaiting();
 }
