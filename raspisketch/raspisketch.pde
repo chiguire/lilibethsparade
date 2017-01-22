@@ -6,13 +6,17 @@ LeapMotion leap;
 GameStateEnum gameState;
 WaitingTicks ticks;
 
-int playerLeftId = -1;
-int playerRightId = -1;
 int numHands = 0;
 
+int playerLeftId = -1;
 float progressLeft = 0.0f;
+PVector previousPalmNormalLeft;
+
+int playerRightId = -1;
 float progressRight = 0.0f;
-float maxProgress = 100.0f;
+PVector previousPalmNormalRight;
+
+final float maxProgress = 100.0f;
 
 Serial screenPort;
 Serial carPort;

@@ -37,9 +37,10 @@ int imageDrawn = 0;
 int lastImageDrawn = -1;
 int animFrame = 0;
 
+const int y_offset = 70;
 const int f_x = 0;
-const int f_y = 50;
-const int h_y = 50+93;
+const int f_y = y_offset;
+const int h_y = y_offset+93;
 const int h_x_left = 67;
 const int h_x_right = 128;
 const int h_x_center = 99;
@@ -198,21 +199,21 @@ void close_hand_waiting_update()
 void ready_starting()
 {
   bmpDraw("bigben.bmp", f_x, f_y);
-  tft.fillCircle(85, 50+120, 15, ILI9341_RED);
-  tft.fillCircle(120, 50+120, 15, ILI9341_RED);
-  tft.fillCircle(155, 50+120, 15, ILI9341_RED);
+  tft.fillCircle(85, y_offset+120, 15, ILI9341_RED);
+  tft.fillCircle(120, y_offset+120, 15, ILI9341_RED);
+  tft.fillCircle(155, y_offset+120, 15, ILI9341_RED);
 }
 
 void set_starting()
 {
   //bmpDraw("bigben.bmp", f_x, f_y);
-  tft.fillCircle(155, 50+120, 15, ILI9341_WHITE);
+  tft.fillCircle(155, y_offset+120, 15, ILI9341_WHITE);
 }
 
 void go_starting()
 {
   //bmpDraw("bigbenne.bmp", f_x, f_y);
-  tft.fillCircle(120, 50+120, 15, ILI9341_WHITE);
+  tft.fillCircle(120, y_offset+120, 15, ILI9341_WHITE);
 }
 
 void playing()
